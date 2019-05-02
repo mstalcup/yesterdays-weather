@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'package:location/location.dart';
 
 void main() => runApp(MyApp());
 
@@ -157,4 +159,183 @@ class _MyHomePageState extends State<MyHomePage> {
       )
     ]),
   );
+}
+
+Future<Map<String, double>> getLocation() async{
+  Map<String, double> currentLocation = new Map<String, double>();
+
+  var location = new Location();
+  String error = '';
+  // Platform messages may fail, so we use a try/catch PlatformException.
+  try {
+    currentLocation = await location.getLocation();
+  } catch (e) {
+    if (e.code == 'PERMISSION_DENIED') {
+      error = 'Permission denied';
+    }
+    currentLocation = null;
+  }
+
+  return currentLocation;
+}
+
+Future<Forecast> fetchPost() async {
+  String darkSkyApiKey = '579a77ae78f5ae084f9d856a3f4b474d';
+  String time = '2019-04-08T22:35:00';
+  String queryString = '?exclude=currently,minutely,hourly,alerts,flags';
+
+  //get lat/long location from phone
+  Map<String, double> location = await getLocation();
+  String latitude = location['latitude'].toString();
+  String longitude = location['longitude'].toString();
+
+  String url = 'https://api.darksky.net/forecast/' + darkSkyApiKey + '/' + latitude + ',' + longitude + ',' + time + queryString;
+
+  final response =
+  await http.get(url);
+
+  if (response.statusCode == 200) {
+    // If server returns an OK response, parse the JSON
+    return Forecast.fromJson(json.decode(response.body));
+  } else {
+    // If that response was not OK, throw an error.
+    throw Exception('Failed to load post');
+  }
+}
+
+class Forecast{
+  final double latitude;
+  final double longitude;
+  final String timezone;
+  final Daily daily;
+  final int offset;
+
+  Forecast({this.latitude, this.longitude, this.timezone, this.daily, this.offset});
+
+  factory Forecast.fromJson(Map<String, dynamic> json) {
+    return Forecast(
+      latitude: json['latitude'],
+      longitude: json['longitude'],
+      timezone: json['timezone'],
+      daily: Daily.fromJson(json['daily']),
+      offset: json['offset'],
+    );
+  }
+}
+
+class Daily{
+  final List<DailyData> dailyData;
+
+  Daily({this.dailyData});
+
+  factory Daily.fromJson(Map<String, dynamic> json) {
+    var list = json['data'] as List;
+    print(list.runtimeType); //returns List<dynamic>
+    List<DailyData> data = list.map((i) => DailyData.fromJson(i)).toList();
+
+    return Daily(
+        dailyData: data
+    );
+  }
+
+}
+
+///see https://darksky.net/dev/docs#time-machine-request
+class DailyData{
+  final int time;
+  final String summary;
+  final String icon;
+  final int sunriseTime;
+  final int sunsetTime;
+  final double moonPhase;
+  final double precipIntensity;
+  final double precipIntensityMax;
+  final int precipIntensityMaxTime;
+  final int precipProbability;
+  final String precipType;
+  final double temperatureHigh;
+  final int temperatureHighTime;
+  final double temperatureLow;
+  final int temperatureLowTime;
+  final double apparentTemperatureHigh;
+  final int apparentTemperatureHighTime;
+  final double apparentTemperatureLow;
+  final int apparentTemperatureLowTime;
+  final double dewPoint;
+  final double humidity;
+  final double pressure;
+  final double windSpeed;
+  final double windGust;
+  final int windGustTime;
+  final int windBearing;
+  final double cloudCover;
+  final int uvIndex;
+  final int uvIndexTime;
+  final double visibility;
+  final double ozone;
+  final double temperatureMin;
+  final int temperatureMinTime;
+  final double temperatureMax;
+  final int temperatureMaxTime;
+  final double apparentTemperatureMin;
+  final int apparentTemperatureMinTime;
+  final double apparentTemperatureMax;
+  final int apparentTemperatureMaxTime;
+
+  DailyData({this.time,this.summary,this.icon,this.sunriseTime,this.sunsetTime,this.moonPhase,this.precipIntensity,
+    this.precipIntensityMax,this.precipIntensityMaxTime,this.precipProbability,this.precipType,this.temperatureHigh,
+    this.temperatureHighTime,this.temperatureLow,this.temperatureLowTime,this.apparentTemperatureHigh,this.apparentTemperatureHighTime,
+    this.apparentTemperatureLow,this.apparentTemperatureLowTime,this.dewPoint,this.humidity,this.pressure,this.windSpeed,this.windGust,
+    this.windGustTime,this.windBearing,this.cloudCover,this.uvIndex,this.uvIndexTime,this.visibility,this.ozone,this.temperatureMin,
+    this.temperatureMinTime,this.temperatureMax,this.temperatureMaxTime,this.apparentTemperatureMin,this.apparentTemperatureMinTime,
+    this.apparentTemperatureMax,this.apparentTemperatureMaxTime});
+
+  factory DailyData.fromJson(Map<String, dynamic> json) {
+
+    return DailyData(
+      time: json['time'],
+      summary: json['summary'],
+      icon: json['icon'],
+      sunriseTime: json['sunriseTime'],
+      sunsetTime: json['sunsetTime'],
+      moonPhase: getDoubleFromJson('moonPhase', json),
+      precipIntensity: getDoubleFromJson('precipIntensity', json),
+      precipIntensityMax: getDoubleFromJson('precipIntensityMax', json),
+      precipIntensityMaxTime: json['precipIntensityMaxTime'],
+      precipProbability: json['precipProbability'],
+      precipType: json['precipType'],
+      temperatureHigh: getDoubleFromJson('temperatureHigh', json),
+      temperatureHighTime: json['temperatureHighTime'],
+      temperatureLow: getDoubleFromJson('temperatureLow', json),
+      temperatureLowTime: json['temperatureLowTime'],
+      apparentTemperatureHigh: getDoubleFromJson('apparentTemperatureHigh', json),
+      apparentTemperatureHighTime: json['apparentTemperatureHighTime'],
+      apparentTemperatureLow: getDoubleFromJson('apparentTemperatureLow', json),
+      apparentTemperatureLowTime: json['apparentTemperatureLowTime'],
+      dewPoint: getDoubleFromJson('dewPoint', json),
+      humidity: getDoubleFromJson('humidity', json),
+      pressure: getDoubleFromJson('pressure', json),
+      windSpeed: getDoubleFromJson('windSpeed', json),
+      windGust: getDoubleFromJson('windGust', json),
+      windGustTime: json['windGustTime'],
+      windBearing: json['windBearing'],
+      cloudCover: getDoubleFromJson('cloudCover', json),
+      uvIndex: json['uvIndex'],
+      uvIndexTime: json['uvIndexTime'],
+      visibility: getDoubleFromJson('visibility', json),
+      ozone: getDoubleFromJson('ozone', json),
+      temperatureMin: getDoubleFromJson('temperatureMin', json),
+      temperatureMinTime: json['temperatureMinTime'],
+      temperatureMax: getDoubleFromJson('temperatureMax', json),
+      temperatureMaxTime: json['temperatureMaxTime'],
+      apparentTemperatureMin: getDoubleFromJson('apparentTemperatureMin', json),
+      apparentTemperatureMinTime: json['apparentTemperatureMinTime'],
+      apparentTemperatureMax: getDoubleFromJson('apparentTemperatureMax', json),
+      apparentTemperatureMaxTime: json['apparentTemperatureMaxTime'],
+    );
+  }
+}
+
+double getDoubleFromJson(String key, Map<String, dynamic> json){
+  return json.containsKey(key) ? json[key].toDouble() : null;
 }
