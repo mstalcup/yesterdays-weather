@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 
 void main() => runApp(MyApp());
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Yesterday''s Weather'),
     );
   }
 }
@@ -48,6 +50,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Forecast forecast;
+  DailyData yesterdaysWeather;
   bool isLoaded = false;
 
   void loadForecastResults(){
@@ -56,6 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
           .then( (e) => setState((){
               isLoaded = true;
               forecast = e;
+              yesterdaysWeather = e.daily.dailyData[0];
           }
       ));
     }
@@ -63,122 +67,67 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Color> colors = const <Color>[Color(0xFFFFC100),Color(0xFF009BEE)];
-
     loadForecastResults();
-    //TODO: how to set state with new info we got from api response?
 
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
+    if (!isLoaded) {
+      //TODO: loading screen
+      return new Container();
+    }
+    else {
+      // This method is rerun every time setState is called, for instance as done
+      // by the _incrementCounter method above.
+      //
+      // The Flutter framework has been optimized to make rerunning build methods
+      // fast, so that you can just rebuild anything that needs updating rather
+      // than having to individually change instances of widgets.
+      return Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: colors,
+              colors: findGradientColors(yesterdaysWeather.icon),
+            ),
+          ),
+          child: Center(
+            // Center is a layout widget. It takes a single child and positions it
+            // in the middle of the parent.
+            child: Column(
+              // Column is also layout widget. It takes a list of children and
+              // arranges them vertically. By default, it sizes itself to fit its
+              // children horizontally, and tries to be as tall as its parent.
+              //
+              // Invoke "debug painting" (press "p" in the console, choose the
+              // "Toggle Debug Paint" action from the Flutter Inspector in Android
+              // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+              // to see the wireframe for each widget.
+              //
+              // Column has various properties to control how it sizes itself and
+              // how it positions its children. Here we use mainAxisAlignment to
+              // center the children vertically; the main axis here is the vertical
+              // axis because Columns are vertical (the cross axis would be
+              // horizontal).
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                titleDisplay(),
+                forecastDisplay(),
+              ],
+            ),
           ),
         ),
-        child: Center(
-          // Center is a layout widget. It takes a single child and positions it
-          // in the middle of the parent.
-          child: Column(
-            // Column is also layout widget. It takes a list of children and
-            // arranges them vertically. By default, it sizes itself to fit its
-            // children horizontally, and tries to be as tall as its parent.
-            //
-            // Invoke "debug painting" (press "p" in the console, choose the
-            // "Toggle Debug Paint" action from the Flutter Inspector in Android
-            // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-            // to see the wireframe for each widget.
-            //
-            // Column has various properties to control how it sizes itself and
-            // how it positions its children. Here we use mainAxisAlignment to
-            // center the children vertically; the main axis here is the vertical
-            // axis because Columns are vertical (the cross axis would be
-            // horizontal).
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              titleSection,
-              forecastDisplay(forecast),
-//              FutureBuilder<Forecast>(
-//                future: fetchPost(),
-//                builder: (context, forecast) {
-//                  if (forecast.hasData) {
-//                    colors = const <Color>[Color(0xFF880E4F),Color(0xFF009BEE)];
-//                    return Text(
-//                        'latitude: ' + forecast.data.latitude.toString() + '\n'
-//                            + 'longitude: ' + forecast.data.longitude.toString() + '\n'
-//                            + 'timezone: ' + forecast.data.timezone.toString() + '\n'
-//                            + 'offset: ' + forecast.data.offset.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].time.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].summary.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].icon.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].sunriseTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].sunsetTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].moonPhase.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].precipIntensity.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].precipIntensityMax.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].precipIntensityMaxTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].precipProbability.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].precipType.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].temperatureHigh.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].temperatureHighTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].temperatureLow.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].temperatureLowTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].apparentTemperatureHigh.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].apparentTemperatureHighTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].apparentTemperatureLow.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].apparentTemperatureLowTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].dewPoint.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].humidity.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].pressure.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].windSpeed.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].windGust.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].windGustTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].windBearing.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].cloudCover.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].uvIndex.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].uvIndexTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].visibility.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].ozone.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].temperatureMin.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].temperatureMinTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].temperatureMax.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].temperatureMaxTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].apparentTemperatureMin.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].apparentTemperatureMinTime.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].apparentTemperatureMax.toString() + '\n'
-//                            + forecast.data.daily.dailyData[0].apparentTemperatureMaxTime.toString()
-//                    );
-//                  } else if (forecast.hasError) {
-//                    return Text("${forecast.error}");
-//                  }
-//
-//                  // By default, show a loading spinner
-//                  return CircularProgressIndicator();
-//                },
-//              ),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Container(
-          decoration: BoxDecoration(
+        bottomNavigationBar: BottomAppBar(
+          child: Container(
+            decoration: BoxDecoration(
 
-          ),
-          height: 50.0,
-          child: Text(
+            ),
+            height: 50.0,
+            child: Text(
               'This goes at the bottom',
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget footerSection = Container(
@@ -202,101 +151,104 @@ class _MyHomePageState extends State<MyHomePage> {
     ),
   );
 
-  Widget titleSection = Container(
-    padding: const EdgeInsets.all(32),
-    child: Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                child: Text(
-                  '72°F',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 84,
-                    shadows: <Shadow>[
-                      Shadow(
-                        offset: Offset(1.0, 1.0),
-                        blurRadius: 1.5,
-                        color: Color.fromARGB(255, 0, 0, 0),
-                      )
-                    ],
+  Container titleDisplay() {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(
+                      yesterdaysWeather.temperatureHigh.toInt().toString() + '°F',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 84,
+                        shadows: <Shadow>[
+                          Shadow(
+                            offset: Offset(1.0, 1.0),
+                            blurRadius: 1.5,
+                            color: Color.fromARGB(255, 0, 0, 0),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-        ),
-      ),
-      Icon(
-        Icons.wb_sunny,
-        color: Colors.white,
-        size: 72,
-      )
-    ]),
-  );
+            ),
+            findIcon(yesterdaysWeather.icon)
+          ]),
+    );
+  }
 
-  Widget forecastDisplay(Forecast forecast){
-      var weatherText = "";
-      if(forecast != null){
-          weatherText = forecast.daily.dailyData[0].summary;
+  Icon findIcon(String iconString){
+      //clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night
+      IconData iconData = FontAwesomeIcons.solidSun;
+      switch(iconString) {
+          case "clear-day": {iconData = FontAwesomeIcons.solidSun;}
+          break;
+          case "clear-night": {iconData = FontAwesomeIcons.solidMoon;}
+          break;
+          case "rain": {iconData = FontAwesomeIcons.cloudRain;}
+          break;
+          case "snow": {iconData = FontAwesomeIcons.snowflake;}
+          break;
+          case "sleet": {iconData = FontAwesomeIcons.cloudRain;}
+          break;
+          case "wind": {iconData = FontAwesomeIcons.wind;}
+          break;
+          case "fog": {iconData = FontAwesomeIcons.cloud;}
+          break;
+          case "cloudy": {iconData = FontAwesomeIcons.cloud;}
+          break;
+          case "partly-cloudy-day": {iconData = FontAwesomeIcons.cloudSun;}
+          break;
+          case "partly-cloudy-night": {iconData = FontAwesomeIcons.cloudMoon;}
+          break;
+
+          default: {iconData = FontAwesomeIcons.solidSun;}
+          break;
       }
-//    if (forecast.hasData) {
-//      colors = const <Color>[Color(0xFF880E4F),Color(0xFF009BEE)];
+
+      return Icon(iconData, size: 84, color: Colors.white);
+  }
+
+  List<Color> findGradientColors(String iconString){
+      List<Color> colors;
+
+      switch(iconString) {
+          case "clear-day":
+          case "wind": {colors = const <Color>[Colors.blue, Colors.cyan];}
+          break;
+          case "clear-night":
+          case "rain":
+          case "snow":
+          case "sleet":
+          case "fog":
+          case "cloudy":
+          case "partly-cloudy-day":
+          case "partly-cloudy-night": {colors = const <Color>[Colors.blueGrey, Colors.white70];}
+          break;
+  
+          default: {colors = const <Color>[Colors.blue, Colors.cyan];}
+          break;
+      }
+
+      return colors;
+  }
+
+  Widget forecastDisplay(){
+      var weatherText = "";
+      if(yesterdaysWeather != null){
+          weatherText = yesterdaysWeather.summary;
+      }
       return Text(
           'It was: ' + weatherText
-//          'latitude: ' + forecast.data.latitude.toString() + '\n'
-//              + 'longitude: ' + forecast.data.longitude.toString() + '\n'
-//              + 'timezone: ' + forecast.data.timezone.toString() + '\n'
-//              + 'offset: ' + forecast.data.offset.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].time.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].summary.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].icon.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].sunriseTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].sunsetTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].moonPhase.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].precipIntensity.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].precipIntensityMax.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].precipIntensityMaxTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].precipProbability.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].precipType.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].temperatureHigh.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].temperatureHighTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].temperatureLow.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].temperatureLowTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].apparentTemperatureHigh.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].apparentTemperatureHighTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].apparentTemperatureLow.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].apparentTemperatureLowTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].dewPoint.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].humidity.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].pressure.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].windSpeed.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].windGust.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].windGustTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].windBearing.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].cloudCover.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].uvIndex.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].uvIndexTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].visibility.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].ozone.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].temperatureMin.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].temperatureMinTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].temperatureMax.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].temperatureMaxTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].apparentTemperatureMin.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].apparentTemperatureMinTime.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].apparentTemperatureMax.toString() + '\n'
-//              + forecast.data.daily.dailyData[0].apparentTemperatureMaxTime.toString()
       );
-//    } else if (forecast.hasError) {
-//      return Text("${forecast.error}");
-//    }
-//
-//    // By default, show a loading spinner
-//    return CircularProgressIndicator();
   }
 }
 
@@ -319,8 +271,12 @@ Future<Map<String, double>> getLocation() async{
 }
 
 Future<Forecast> fetchPost() async {
+  var now = new DateTime.now();
+  var yesterday = new DateTime(now.year, now.month, now.day -1);
+  var formatter = new DateFormat('yyyy-MM-ddThh:mm:ss');
+
   String darkSkyApiKey = '579a77ae78f5ae084f9d856a3f4b474d';
-  String time = '2019-04-08T22:35:00';
+  String time = formatter.format(yesterday);
   String queryString = '?exclude=currently,minutely,hourly,alerts,flags';
 
   //get lat/long location from phone
