@@ -47,8 +47,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Forecast forecast;
+  bool isLoaded = false;
+
+  void loadForecastResults(){
+    if(!isLoaded){
+      fetchPost()
+          .then( (e) => setState((){
+              isLoaded = true;
+              forecast = e;
+          }
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    List<Color> colors = const <Color>[Color(0xFFFFC100),Color(0xFF009BEE)];
+
+    loadForecastResults();
+    //TODO: how to set state with new info we got from api response?
+
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -61,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
           gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.blueAccent, Colors.lightBlueAccent],
+              colors: colors,
           ),
         ),
         child: Center(
@@ -83,8 +102,67 @@ class _MyHomePageState extends State<MyHomePage> {
             // axis because Columns are vertical (the cross axis would be
             // horizontal).
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [
+            children: <Widget>[
               titleSection,
+              forecastDisplay(forecast),
+//              FutureBuilder<Forecast>(
+//                future: fetchPost(),
+//                builder: (context, forecast) {
+//                  if (forecast.hasData) {
+//                    colors = const <Color>[Color(0xFF880E4F),Color(0xFF009BEE)];
+//                    return Text(
+//                        'latitude: ' + forecast.data.latitude.toString() + '\n'
+//                            + 'longitude: ' + forecast.data.longitude.toString() + '\n'
+//                            + 'timezone: ' + forecast.data.timezone.toString() + '\n'
+//                            + 'offset: ' + forecast.data.offset.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].time.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].summary.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].icon.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].sunriseTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].sunsetTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].moonPhase.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].precipIntensity.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].precipIntensityMax.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].precipIntensityMaxTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].precipProbability.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].precipType.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].temperatureHigh.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].temperatureHighTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].temperatureLow.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].temperatureLowTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].apparentTemperatureHigh.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].apparentTemperatureHighTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].apparentTemperatureLow.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].apparentTemperatureLowTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].dewPoint.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].humidity.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].pressure.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].windSpeed.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].windGust.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].windGustTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].windBearing.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].cloudCover.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].uvIndex.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].uvIndexTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].visibility.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].ozone.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].temperatureMin.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].temperatureMinTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].temperatureMax.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].temperatureMaxTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].apparentTemperatureMin.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].apparentTemperatureMinTime.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].apparentTemperatureMax.toString() + '\n'
+//                            + forecast.data.daily.dailyData[0].apparentTemperatureMaxTime.toString()
+//                    );
+//                  } else if (forecast.hasError) {
+//                    return Text("${forecast.error}");
+//                  }
+//
+//                  // By default, show a loading spinner
+//                  return CircularProgressIndicator();
+//                },
+//              ),
             ],
           ),
         ),
@@ -159,6 +237,67 @@ class _MyHomePageState extends State<MyHomePage> {
       )
     ]),
   );
+
+  Widget forecastDisplay(Forecast forecast){
+      var weatherText = "";
+      if(forecast != null){
+          weatherText = forecast.daily.dailyData[0].summary;
+      }
+//    if (forecast.hasData) {
+//      colors = const <Color>[Color(0xFF880E4F),Color(0xFF009BEE)];
+      return Text(
+          'It was: ' + weatherText
+//          'latitude: ' + forecast.data.latitude.toString() + '\n'
+//              + 'longitude: ' + forecast.data.longitude.toString() + '\n'
+//              + 'timezone: ' + forecast.data.timezone.toString() + '\n'
+//              + 'offset: ' + forecast.data.offset.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].time.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].summary.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].icon.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].sunriseTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].sunsetTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].moonPhase.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].precipIntensity.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].precipIntensityMax.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].precipIntensityMaxTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].precipProbability.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].precipType.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].temperatureHigh.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].temperatureHighTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].temperatureLow.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].temperatureLowTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].apparentTemperatureHigh.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].apparentTemperatureHighTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].apparentTemperatureLow.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].apparentTemperatureLowTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].dewPoint.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].humidity.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].pressure.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].windSpeed.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].windGust.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].windGustTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].windBearing.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].cloudCover.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].uvIndex.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].uvIndexTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].visibility.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].ozone.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].temperatureMin.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].temperatureMinTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].temperatureMax.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].temperatureMaxTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].apparentTemperatureMin.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].apparentTemperatureMinTime.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].apparentTemperatureMax.toString() + '\n'
+//              + forecast.data.daily.dailyData[0].apparentTemperatureMaxTime.toString()
+      );
+//    } else if (forecast.hasError) {
+//      return Text("${forecast.error}");
+//    }
+//
+//    // By default, show a loading spinner
+//    return CircularProgressIndicator();
+  }
 }
 
 Future<Map<String, double>> getLocation() async{
