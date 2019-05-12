@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:flutter/rendering.dart';
 
 void main() => runApp(MyApp());
 
@@ -82,6 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // than having to individually change instances of widgets.
       return Scaffold(
         body: Container(
+          height: double.maxFinite,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -108,21 +110,20 @@ class _MyHomePageState extends State<MyHomePage> {
               // axis because Columns are vertical (the cross axis would be
               // horizontal).
               mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              verticalDirection: VerticalDirection.down,
               children: <Widget>[
                 titleDisplay(),
-                forecastDisplay(),
+                Expanded(
+                  child: Container (
+                    child: forecastDisplay(),
+                  )
+                ),
+                Container (
+                  color: Color(0xFF333333),
+                  child: footerSection,
+                ),
               ],
-            ),
-          ),
-        ),
-        bottomNavigationBar: BottomAppBar(
-          child: Container(
-            decoration: BoxDecoration(
-
-            ),
-            height: 50.0,
-            child: Text(
-              'Powered by Dark Sky',
             ),
           ),
         ),
@@ -130,25 +131,14 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Widget footerSection = Container(
-    padding: const EdgeInsets.all(32),
-    child: Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                child: Text(
-                  'Icons provided by http://weathericons.io'
-                )
-              )
-            ],
-          ),
-        )
-      ],
-    ),
+  Widget footerSection = Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        child: Image(
+          image: AssetImage('assets/poweredby-oneline-darkbackground.png'),
+          alignment: Alignment.bottomCenter,
+      )
+    )
   );
 
   Container titleDisplay() {
@@ -346,7 +336,7 @@ class DailyData{
   final double precipIntensity;
   final double precipIntensityMax;
   final int precipIntensityMaxTime;
-  final double precipProbability;
+  final int precipProbability;
   final String precipType;
   final double temperatureHigh;
   final int temperatureHighTime;
