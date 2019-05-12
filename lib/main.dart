@@ -346,7 +346,7 @@ class DailyData{
   final double precipIntensity;
   final double precipIntensityMax;
   final int precipIntensityMaxTime;
-  final int precipProbability;
+  final double precipProbability;
   final String precipType;
   final double temperatureHigh;
   final int temperatureHighTime;
