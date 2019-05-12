@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             height: 50.0,
             child: Text(
-              'This goes at the bottom',
+              'Powered by Dark Sky',
             ),
           ),
         ),
@@ -169,8 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         fontSize: 84,
                         shadows: <Shadow>[
                           Shadow(
-                            offset: Offset(1.0, 1.0),
-                            blurRadius: 1.5,
+                            offset: Offset(0.5, 0.5),
+                            blurRadius: 1.0,
                             color: Color.fromARGB(255, 0, 0, 0),
                           )
                         ],
