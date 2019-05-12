@@ -117,10 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   child: Container (
                     child: Column(
-                      children: <Widget>[
-                        detailsDisplay()[0],//highTempContainer
-                        detailsDisplay()[1],//lowTempContainer ],
-                      ]
+                      children: detailsDisplay()
                     ),
                   )
                 ),
