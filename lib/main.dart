@@ -110,7 +110,8 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 titleDisplay(),
-                forecastDisplay(),
+                detailsDisplay()[0],//highTempContainer
+                detailsDisplay()[1],//lowTempContainer
               ],
             ),
           ),
@@ -155,34 +156,67 @@ class _MyHomePageState extends State<MyHomePage> {
     return Container(
       padding: const EdgeInsets.all(32),
       child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
+            Column(
+              children: [
+                Text(
+                  yesterdaysWeather.temperatureHigh.toInt().toString() + '°F',
+                  style: whiteTextStyle(84)
+                ),
+              ],
+            ),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: new Column(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Text(
-                      yesterdaysWeather.temperatureHigh.toInt().toString() + '°F',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 84,
-                        shadows: <Shadow>[
-                          Shadow(
-                            offset: Offset(0.5, 0.5),
-                            blurRadius: 1.0,
-                            color: Color.fromARGB(255, 0, 0, 0),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
+                  findIcon(yesterdaysWeather.icon),
+                  summaryDisplay(),
                 ],
               ),
             ),
-            findIcon(yesterdaysWeather.icon)
+      ]),
+    );
+  }
+
+  List<Widget> detailsDisplay() {
+    List<Container> containers = [];
+    var formatter = new DateFormat('h:mm a');
+    DateTime highDate = new DateTime.fromMillisecondsSinceEpoch(yesterdaysWeather.temperatureHighTime * 1000);
+    DateTime lowDate = new DateTime.fromMillisecondsSinceEpoch(yesterdaysWeather.temperatureLowTime * 1000);
+    var highTempTime = formatter.format(highDate);
+    var lowTempTime = formatter.format(lowDate);
+
+    Container highTempContainer = Container(
+      padding: const EdgeInsets.fromLTRB(32,32,32,0),
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(FontAwesomeIcons.arrowUp, size: 35, color: Colors.redAccent),
+            Text(
+                yesterdaysWeather.temperatureHigh.toInt().toString() + '°F at ' + highTempTime,
+                style: whiteTextStyle(35)
+            ),
           ]),
     );
+
+    containers.add(highTempContainer);
+
+    Container lowTempContainer = Container(
+      padding: const EdgeInsets.fromLTRB(32,10,32,0),
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(FontAwesomeIcons.arrowDown, size: 35, color: Colors.blueGrey),
+            Text(
+                yesterdaysWeather.temperatureLow.toInt().toString() + '°F at ' + lowTempTime,
+                style: whiteTextStyle(35)
+            ),
+          ]),
+    );
+
+    containers.add(lowTempContainer);
+
+    return containers;
   }
 
   Icon findIcon(String iconString){
@@ -241,15 +275,30 @@ class _MyHomePageState extends State<MyHomePage> {
       return colors;
   }
 
-  Widget forecastDisplay(){
-      var weatherText = "";
-      if(yesterdaysWeather != null){
-          weatherText = yesterdaysWeather.summary;
-      }
-      return Text(
-          'It was: ' + weatherText
-      );
+  Widget summaryDisplay() {
+    return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+            yesterdaysWeather.summary,
+            textAlign: TextAlign.center,
+            style: whiteTextStyle(12)
+        )
+    );
   }
+}
+
+TextStyle whiteTextStyle(double fontSize){
+  return TextStyle(
+    color: Colors.white,
+    fontSize: fontSize,
+    shadows: <Shadow>[
+      Shadow(
+        offset: Offset(0.5, 0.5),
+        blurRadius: 1.0,
+        color: Color.fromARGB(255, 0, 0, 0),
+      )
+    ],
+  );
 }
 
 Future<Map<String, double>> getLocation() async{
@@ -397,7 +446,7 @@ class DailyData{
       precipIntensity: getDoubleFromJson('precipIntensity', json),
       precipIntensityMax: getDoubleFromJson('precipIntensityMax', json),
       precipIntensityMaxTime: json['precipIntensityMaxTime'],
-      precipProbability: json['precipProbability'],
+      precipProbability: getDoubleFromJson('precipProbability', json),
       precipType: json['precipType'],
       temperatureHigh: getDoubleFromJson('temperatureHigh', json),
       temperatureHighTime: json['temperatureHighTime'],
