@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     var now = new DateTime.now();
     var yesterday = new DateTime(now.year, now.month, now.day -1);
-    var formatter = new DateFormat('EEEE MMM dd');
+    var formatter = new DateFormat('EEEE, MMM dd');
     yesterdayDisplayDate = formatter.format(yesterday);
   }
 
@@ -158,10 +158,6 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Column(
               children: [
-                Text(
-                    "Yesterday's Weather",
-                    style: whiteTextStyle(35)
-                ),
                 Text(
                   yesterdayDisplayDate,
                   style: whiteTextStyle(35),
