@@ -139,6 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Image(
           image: AssetImage('assets/poweredby-oneline-darkbackground.png'),
           alignment: Alignment.bottomCenter,
+          width: 250
       )
     )
   );
