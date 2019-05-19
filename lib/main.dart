@@ -53,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Forecast forecast;
   DailyData yesterdaysWeather;
   bool isLoaded = false;
+  String yesterdayDisplayDate;
 
   void loadForecastResults(){
     if(!isLoaded){
@@ -64,6 +65,10 @@ class _MyHomePageState extends State<MyHomePage> {
           }
       ));
     }
+    var now = new DateTime.now();
+    var yesterday = new DateTime(now.year, now.month, now.day -1);
+    var formatter = new DateFormat('EEEE MMM dd');
+    yesterdayDisplayDate = formatter.format(yesterday);
   }
 
   @override
@@ -113,6 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisSize: MainAxisSize.min,
               verticalDirection: VerticalDirection.down,
               children: <Widget>[
+                headerDisplay(),
                 titleDisplay(),
                 Expanded(
                   child: Container (
@@ -143,6 +149,28 @@ class _MyHomePageState extends State<MyHomePage> {
       )
     )
   );
+
+  Container headerDisplay() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Column(
+              children: [
+                Text(
+                    "Yesterday's Weather",
+                    style: whiteTextStyle(35)
+                ),
+                Text(
+                  yesterdayDisplayDate,
+                  style: whiteTextStyle(35),
+                )
+              ],
+            ),
+          ]),
+    );
+  }
 
   Container titleDisplay() {
     return Container(
