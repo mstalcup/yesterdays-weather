@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:flutter/rendering.dart';
+import 'package:geocoder/geocoder.dart';
 
 void main() => runApp(MyApp());
 
@@ -55,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isLoaded = false;
   String yesterdayDisplayDate;
   String humidityPercentage;
+  var geocoderAddress;
 
   void loadForecastResults(){
     if(!isLoaded){
@@ -63,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
               isLoaded = true;
               forecast = e;
               yesterdaysWeather = e.daily.dailyData[0];
+              geocoderAddress = e.address;
           }
       ));
     }
@@ -196,7 +199,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text(
                   yesterdayDisplayDate,
                   style: whiteTextStyle(35),
-                )
+                ),
+                Text(
+                  geocoderAddress != null ? (geocoderAddress.locality + ', ' + geocoderAddress.adminArea) : '',
+                  style: whiteTextStyle(35),
+                ),
               ],
             ),
           ]),
@@ -391,7 +398,14 @@ Future<Forecast> fetchPost() async {
 
   if (response.statusCode == 200) {
     // If server returns an OK response, parse the JSON
-    return Forecast.fromJson(json.decode(response.body));
+    Forecast forecast = Forecast.fromJson(json.decode(response.body));
+
+    //find the address information associated with the geolcation of this forecast
+    final coordinates = new Coordinates(forecast.latitude, forecast.longitude);
+    var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    forecast.address = addresses.first;
+
+    return forecast;
   } else {
     // If that response was not OK, throw an error.
     throw Exception('Failed to load post');
@@ -404,6 +418,7 @@ class Forecast{
   final String timezone;
   final Daily daily;
   final int offset;
+  Address address;
 
   Forecast({this.latitude, this.longitude, this.timezone, this.daily, this.offset});
 

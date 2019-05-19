@@ -21,6 +21,7 @@ dependencies:
   location: ^1.4.1
   intl: ^0.15.7
   font_awesome_flutter: ^8.2.0
+  geocoder: ^0.1.2
   flutter:
     sdk: flutter
 
