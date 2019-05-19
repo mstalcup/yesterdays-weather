@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    SystemChrome.setEnabledSystemUIOverlays([]);
     return MaterialApp(
       title: 'Weather App',
       theme: ThemeData(
