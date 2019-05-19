@@ -54,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   DailyData yesterdaysWeather;
   bool isLoaded = false;
   String yesterdayDisplayDate;
+  String humidityPercentage;
 
   void loadForecastResults(){
     if(!isLoaded){
@@ -69,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var yesterday = new DateTime(now.year, now.month, now.day -1);
     var formatter = new DateFormat('EEEE, MMM dd');
     yesterdayDisplayDate = formatter.format(yesterday);
+
   }
 
   @override
@@ -127,6 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   )
                 ),
+                additionalDisplay(),
                 Container (
                   color: Color(0xFF333333),
                   child: footerSection,
@@ -137,6 +140,38 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
     }
+  }
+
+  Container additionalDisplay() {
+    var humidity = yesterdaysWeather.humidity * 100;
+    humidityPercentage = humidity.toString();
+    var hourFormatter = new DateFormat('h:mm a');
+    var sunriseTime = hourFormatter.format(new DateTime.fromMillisecondsSinceEpoch(yesterdaysWeather.sunriseTime * 1000));
+    var sunsetTime = hourFormatter.format(new DateTime.fromMillisecondsSinceEpoch(yesterdaysWeather.sunsetTime * 1000));
+
+    return Container(
+      padding: const EdgeInsets.all(32),
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Column(
+              children: [
+                Text(
+                  'Humidity: ' + humidityPercentage + '%',
+                  style: whiteTextStyle(24),
+                ),
+                Text(
+                  'Sunrise at ' + sunriseTime,
+                  style: whiteTextStyle(24),
+                ),
+                Text(
+                  'Sunset at ' + sunsetTime,
+                  style: whiteTextStyle(24),
+                ),
+              ],
+            ),
+          ]),
+    );
   }
 
   Widget footerSection = Align(
@@ -196,11 +231,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Widget> detailsDisplay() {
     List<Container> containers = [];
-    var formatter = new DateFormat('h:mm a');
+    var hourFormatter = new DateFormat('h:mm a');
     DateTime highDate = new DateTime.fromMillisecondsSinceEpoch(yesterdaysWeather.temperatureHighTime * 1000);
     DateTime lowDate = new DateTime.fromMillisecondsSinceEpoch(yesterdaysWeather.temperatureLowTime * 1000);
-    var highTempTime = formatter.format(highDate);
-    var lowTempTime = formatter.format(lowDate);
+    var highTempTime = hourFormatter.format(highDate);
+    var lowTempTime = hourFormatter.format(lowDate);
 
     Container highTempContainer = Container(
       padding: const EdgeInsets.fromLTRB(32,32,32,0),
