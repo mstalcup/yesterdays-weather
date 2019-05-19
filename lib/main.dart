@@ -161,15 +161,15 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Text(
                   'Humidity: ' + humidityPercentage + '%',
-                  style: whiteTextStyle(24),
+                  style: greyTextStyle(24),
                 ),
                 Text(
                   'Sunrise at ' + sunriseTime,
-                  style: whiteTextStyle(24),
+                  style: greyTextStyle(24),
                 ),
                 Text(
                   'Sunset at ' + sunsetTime,
-                  style: whiteTextStyle(24),
+                  style: greyTextStyle(24),
                 ),
               ],
             ),
@@ -202,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Text(
                   geocoderAddress != null ? (geocoderAddress.locality + ', ' + geocoderAddress.adminArea) : '',
-                  style: whiteTextStyle(35),
+                  style: whiteTextStyle(22),
                 ),
               ],
             ),
@@ -354,6 +354,20 @@ TextStyle whiteTextStyle(double fontSize){
         offset: Offset(0.5, 0.5),
         blurRadius: 1.0,
         color: Color.fromARGB(255, 0, 0, 0),
+      )
+    ],
+  );
+}
+
+TextStyle greyTextStyle(double fontSize){
+  return TextStyle(
+    color: Colors.blueGrey,
+    fontSize: fontSize,
+    shadows: <Shadow>[
+      Shadow(
+        offset: Offset(0.5, 0.5),
+        blurRadius: 1.0,
+        color: Color.fromARGB(255, 200, 200, 200),
       )
     ],
   );
